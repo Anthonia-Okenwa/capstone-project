@@ -1,19 +1,25 @@
+############################################
+# General / Environment
+############################################
+
+variable "environment" {
+  description = "Environment name (e.g. dev, staging, prod)"
+  type        = string
+  default     = "staging"
+}
+
+############################################
+# Networking (VPC)
+############################################
+
 variable "vpc_cidrblock" {
   description = "CIDR block for the VPC"
   type        = string
   default     = "192.168.0.0/16"
-  
-}
-
-variable "environment" {
-  description = "Environment name (e.g., dev, staging, prod)"
-  type        = string
-  default     = "staging"
-  
 }
 
 variable "create_subnet" {
-  description = "Flag to create a subnet"
+  description = "Whether to create subnets"
   type        = bool
   default     = true
 }
@@ -22,147 +28,127 @@ variable "countsub" {
   description = "Number of subnets to create"
   type        = number
   default     = 2
-  
 }
+
 variable "create_elastic_ip" {
-  description = "Flag to create Elastic IPs"
+  description = "Whether to create Elastic IPs"
   type        = bool
   default     = true
 }
 
+############################################
+# EKS Cluster
+############################################
+
+variable "cluster_name" {
+  description = "Name of the EKS cluster"
+  type        = string
+  default     = "eks-cluster"
+}
+
+variable "eks_version" {
+  description = "EKS cluster Kubernetes version"
+  type        = string
+  default     = "1.29"
+}
+
+############################################
+# EKS Node Group
+############################################
 
 variable "desired_size" {
-  description = "Desired size of the EKS node group"
+  description = "Desired number of worker nodes"
+  type        = number
+  default     = 2
+}
+
+variable "min_size" {
+  description = "Minimum number of worker nodes"
   type        = number
   default     = 2
 }
 
 variable "max_size" {
-  description = "Maximum size of the EKS node group"
+  description = "Maximum number of worker nodes"
   type        = number
   default     = 6
 }
 
-variable "min_size" {
-  description = "Minimum size of the EKS node group"
-  type        = number
-  default     = 2 
+variable "instance_types" {
+  description = "EC2 instance types for worker nodes"
+  type        = list(string)
+  default     = ["t3.medium"]
 }
 
-variable "instance_types" {
-  description = "Instance types for the EKS node group"
-  type        = list(string)
-  default     = ["t2.micro"]    
-} 
-
 variable "capacity_type" {
-  description = "Capacity type for the EKS node group"
+  description = "Capacity type for node group (ON_DEMAND or SPOT)"
   type        = string
   default     = "ON_DEMAND"
 }
-variable "eks_version" {
-  description = "EKS cluster version"
-  type        = string
-  default     = "1.32"
-}
+
 variable "ami_type" {
-  description = "AMI type for the EKS node group"
+  description = "AMI type for EKS nodes"
   type        = string
-  default     = "AL2_x86_64" # Use AL2_x86_64 for x86 instances, AL2_ARM_64 for ARM instances
+  default     = "AL2_x86_64"
 }
 
-variable "label_one" {
-  description = "Label for the EKS node group"
-  type        = string
-  default     = "system"
-}
-
-variable "zone_name" {
-  description = "Name of the DNS zone"
-  type        = string
-  default     = "example.com"
-}
-
-variable "domain-name" {
-  description = "Domain name to be created"
-  type        = string
-  default     = "myapp.example.com"
-}
-
-variable "namecheap_api_user" {
-  description = "Namecheap API user"
-  type        = string
-  default     = "smartobi"
-}
-variable "namecheap_api_key" {
-  description = "Namecheap API key"
-  type        = string
-  default     = "a3ca57241b794d44b0fc3387ca9b62a9"
-}
-variable "namecheap_username" {
-  description = "Namecheap username"
-  type        = string
-  default     = "smartobi"
-}
-variable "namecheap_client_ip" {
-  description = "Client IP for Namecheap API access"
-  type        = string
-  default     = "3.101.24.8" # Replace with your actual client IP
-}
-
-#===========
-
-variable "db_instance_class" {
-  description = "Instance class for the RDS database"
-  type        = string
-  default     = "db.t3.micro" 
-}
-
-variable "db_allocated_storage" {
-  description = "Storage allocated to the DB instance (in GB)"
-  type        = number
-  default     = 20
-}
-
-# variable "db_subnet_group_name" {
-#   description = "Name of the DB subnet group"
-#   type        = string
-#   default     = "my-db-subnet-group"
-# }
-
-variable "db_username" {
-  description = "Username for the database"
-  type        = string
-  default     = "admin"
-}
-
-variable "db_password" {
-  description = "Password for the database"
-  type        = string
-  default     = "password123"
-  sensitive   = true
-}
-
-variable "db_name" {
-  description = "Database name"
-  type        = string
-  default     = "production_db"
-}
-variable "cluster_name" {
-  description = "The name of the EKS cluster"
-  type        = string
-  default     = "eks-cluster"
-}
+############################################
+# Container Registry (ECR)
+############################################
 
 variable "repository_name" {
   description = "Name of the ECR repository"
   type        = string
   default     = "eks-repository"
-  
 }
 
-variable "email" {
-  description = "Email address for notifications and certificates"
+############################################
+# DNS / Domain (Route 53)
+############################################
+
+variable "domain_name" {
+  description = "Base domain name (e.g. example.com)"
   type        = string
-  default     = "support@digitalwitchng.online"
+}
+
+############################################
+# Certificate / Notifications
+############################################
+
+variable "email" {
+  description = "Email used for TLS certificates and alerts"
+  type        = string
+}
+
+############################################
+# Database (RDS)
+############################################
+
+variable "db_instance_class" {
+  description = "RDS instance class"
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "db_allocated_storage" {
+  description = "Allocated storage for RDS (GB)"
+  type        = number
+  default     = 20
+}
+
+variable "db_name" {
+  description = "Initial database name"
+  type        = string
+  default     = "production_db"
+}
+
+variable "db_username" {
+  description = "Master username for the database"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Master password for the database"
+  type        = string
+  sensitive   = true
 }
